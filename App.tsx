@@ -1,15 +1,12 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useRef } from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";
-import { Picker } from "@react-native-picker/picker";
+import { StatusBar } from "expo-status-bar";
+import Controls from "./Controls";
+import ProgressBar from "./ProgressBar";
+import Schedule from "./Schedule";
+import TimePicker from "./TimePicker";
 
 const styles = StyleSheet.create({
   container: {
@@ -29,10 +26,8 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
-  const value = new Animated.Value(0);
-  const loadingAnimated = useRef(value).current;
-  const [sound, setSound] = React.useState<Sound>();
-  const [selectedValue, setSelectedValue] = React.useState("java");
+  const [duration, setDuration] = useState<number>();
+  const [sound, setSound] = useState<Sound>();
 
   async function playSound() {
     console.log("Loading Sound");
@@ -54,43 +49,20 @@ export default function App() {
       : undefined;
   }, [sound]);
 
-  useEffect(() => {
-    Animated.timing(loadingAnimated, {
-      toValue: 1,
-      duration: 60000,
-      isInteraction: false,
-      useNativeDriver: false,
-    }).start();
-  }, [loadingAnimated]);
-
   return (
     <View style={styles.container}>
-      <Picker
-        selectedValue={selectedValue}
-        style={{ height: 50, width: 150 }}
-        onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-      >
-        <Picker.Item label="Java" value="java" />
-        <Picker.Item label="JavaScript" value="js" />
-      </Picker>
-      {/*<View style={{ flexDirection: "row", height: 45, padding: 20 }}>*/}
-      {/*  <Animated.View*/}
-      {/*    style={{ backgroundColor: "blue", flex: loadingAnimated }}*/}
-      {/*  />*/}
-      {/*  <Animated.View*/}
-      {/*    style={{*/}
-      {/*      backgroundColor: "gray",*/}
-      {/*      flex: loadingAnimated.interpolate({*/}
-      {/*        inputRange: [0, 1],*/}
-      {/*        outputRange: [1, 0],*/}
-      {/*      }),*/}
-      {/*    }}*/}
-      {/*  />*/}
-      {/*</View>*/}
-      {/*<TouchableOpacity onPress={playSound} style={styles.button}>*/}
-      {/*  <Text style={styles.buttonText}>Test Button</Text>*/}
-      {/*</TouchableOpacity>*/}
-      {/*<StatusBar style="auto" />*/}
+      <ProgressBar />
+      <Controls />
+      <Schedule />
+      <TimePicker
+        onChange={(newDuration) => {
+          setDuration(newDuration);
+        }}
+      />
+      <TouchableOpacity onPress={playSound} style={styles.button}>
+        <Text style={styles.buttonText}>Test Button</Text>
+      </TouchableOpacity>
+      <StatusBar style="auto" />
     </View>
   );
 }
